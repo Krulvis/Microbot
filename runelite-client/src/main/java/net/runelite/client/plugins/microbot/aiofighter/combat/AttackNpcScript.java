@@ -4,7 +4,6 @@ import lombok.SneakyThrows;
 import net.runelite.api.Actor;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.gameval.ItemID;
-import net.runelite.api.gameval.VarPlayerID;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.aiofighter.AIOFighterConfig;
@@ -12,6 +11,7 @@ import net.runelite.client.plugins.microbot.aiofighter.AIOFighterPlugin;
 import net.runelite.client.plugins.microbot.aiofighter.enums.AttackStyle;
 import net.runelite.client.plugins.microbot.aiofighter.enums.AttackStyleMapper;
 import net.runelite.client.plugins.microbot.aiofighter.enums.State;
+import net.runelite.client.plugins.microbot.aiofighter.enums.Superior;
 import net.runelite.client.plugins.microbot.shortestpath.ShortestPathPlugin;
 import net.runelite.client.plugins.microbot.util.ActorModel;
 import net.runelite.client.plugins.microbot.util.antiban.Rs2Antiban;
@@ -45,11 +45,16 @@ public class AttackNpcScript extends Script {
     public static Actor currentNpc = null;
     public static AtomicReference<List<Rs2NpcModel>> filteredAttackableNpcs = new AtomicReference<>(new ArrayList<>());
     public static Rs2WorldArea attackableArea = null;
+    public long superiorSpawnedTime = -1L;
     private boolean messageShown = false;
     private int noNpcCount = 0;
 
     public static void skipNpc() {
         currentNpc = null;
+    }
+
+    private boolean superiorActive() {
+        return superiorSpawnedTime != -1L && System.currentTimeMillis() - superiorSpawnedTime < 120000L;
     }
 
     @SneakyThrows
@@ -77,7 +82,8 @@ public class AttackNpcScript extends Script {
 
                 attackableArea = new Rs2WorldArea(config.centerLocation().toWorldArea());
                 attackableArea = attackableArea.offset(config.attackRadius());
-                List<String> npcsToAttack = Arrays.stream(config.attackableNpcs().split(","))
+                List<String> npcsToAttack = superiorActive() ? Superior.allNames()
+                        : Arrays.stream(config.attackableNpcs().split(","))
                         .map(x -> x.trim().toLowerCase())
                         .collect(Collectors.toList());
                 filteredAttackableNpcs.set(
