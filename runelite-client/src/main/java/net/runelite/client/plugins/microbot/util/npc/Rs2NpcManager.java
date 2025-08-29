@@ -253,6 +253,17 @@ public class Rs2NpcManager {
     }
 
     /**
+     * Retrieves a list of superior monsters by name
+     * @return Distinct list containing names of superior monsters
+     */
+    public static List<String> getSuperiorMonsters() {
+        return statsMap.values().stream().filter(e ->
+                //Kurask gives the least XP per HP (2767 for 420 hp)
+                e.isSlayerMonster() && e.getHitpoints() > 1 && e.getSlayerXp() > e.getHitpoints() * 6.5
+        ).map(Rs2NpcStats::getName).distinct().collect(Collectors.toList());
+    }
+
+    /**
      * Get slayer monsters by category (category is the same as the slayer task name, e.g., Monster: Fire Giant, Category/TaskName: Fire Giants).
      * This will get all monster variations for the task including superior variant.
      */

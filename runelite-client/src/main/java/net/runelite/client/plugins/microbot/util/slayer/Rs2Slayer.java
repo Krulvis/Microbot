@@ -1,6 +1,6 @@
 package net.runelite.client.plugins.microbot.util.slayer;
 
-import net.runelite.api.EnumID;
+import net.runelite.api.Actor;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.gameval.ItemID;
 import net.runelite.api.gameval.VarPlayerID;
@@ -34,6 +34,8 @@ public class Rs2Slayer {
      * The constant blacklistedSlayerMonsters.
      */
     public static List<String> blacklistedSlayerMonsters = new ArrayList<>();
+
+    private static final List<String> superiorSlayerMonsters = new ArrayList<>();
 
     /**
      * Checks if the player has an active Slayer task.
@@ -90,23 +92,23 @@ public class Rs2Slayer {
     /**
      * Retrieves the location of the Slayer task creature based on certain parameters.
      *
-     * @param minClustering the minimum clustering monsters for the location
+     * @param minClustering   the minimum clustering monsters for the location
      * @param avoidWilderness true if the location should avoid the wilderness, false otherwise
      * @return the WorldPoint representing the location of the Slayer task creature
      */
     public static MonsterLocation getSlayerTaskLocation(int minClustering, boolean avoidWilderness) {
         List<String> names = getSlayerMonsters();
         if (names == null || names.isEmpty()) {
-            Microbot.log(Level.DEBUG,"No Slayer task found or no monsters available for the task.");
+            Microbot.log(Level.DEBUG, "No Slayer task found or no monsters available for the task.");
             return null;
         }
 
-        MonsterLocation monsterLocation = Rs2NpcManager.getClosestLocation(names.get(0),minClustering,avoidWilderness);
+        MonsterLocation monsterLocation = Rs2NpcManager.getClosestLocation(names.get(0), minClustering, avoidWilderness);
         slayerTaskMonsterTarget = names.get(0);
         // if location is null, check next name
         if (monsterLocation == null) {
             for (int i = 1; i < names.size(); i++) {
-                monsterLocation = Rs2NpcManager.getClosestLocation(names.get(i),minClustering,avoidWilderness);
+                monsterLocation = Rs2NpcManager.getClosestLocation(names.get(i), minClustering, avoidWilderness);
                 if (monsterLocation != null) {
                     slayerTaskMonsterTarget = names.get(i);
                     break;
@@ -121,7 +123,6 @@ public class Rs2Slayer {
      * Gets slayer task location.
      *
      * @param minClustering the min clustering
-     *
      * @return the slayer task location
      */
     public static MonsterLocation getSlayerTaskLocation(int minClustering) {
@@ -154,13 +155,13 @@ public class Rs2Slayer {
 
     /**
      * Retrieves the weakness item for the player's current Slayer task creature.
-     *
+     * <p>
      * This method first checks if the player has an active Slayer task. If there is no active task,
      * it returns null. Otherwise, it retrieves the weakness item ID for the Slayer task creature
      * and then the name of the item using the Microbot getItemManager to fetch the item composition.
      *
      * @return the name of the weakness item for the Slayer task creature as a String,
-     *         or null if the player does not have an active task
+     * or null if the player does not have an active task
      */
     // get weakness item for slayer task
     public static String getSlayerTaskWeaknessName() {
@@ -219,7 +220,6 @@ public class Rs2Slayer {
      * Walk to slayer master boolean.
      *
      * @param master the master
-     *
      * @return the boolean
      */
     public static boolean walkToSlayerMaster(SlayerMaster master) {
@@ -230,7 +230,6 @@ public class Rs2Slayer {
      * Prepare item transports list.
      *
      * @param cachedMonsterLocation the cached monster location
-     *
      * @return the list
      */
     public static List<Transport> prepareItemTransports(WorldPoint cachedMonsterLocation) {
@@ -247,7 +246,7 @@ public class Rs2Slayer {
         ShortestPathPlugin.getPathfinderConfig().setUseBankItems(false);
 
         transports
-                .forEach(t -> Microbot.log(Level.DEBUG,"Item required: " + t));
+                .forEach(t -> Microbot.log(Level.DEBUG, "Item required: " + t));
 
         return getMissingItemTransports(transports);
     }
@@ -277,7 +276,6 @@ public class Rs2Slayer {
      * Gets missing item ids.
      *
      * @param transports the transports
-     *
      * @return the missing item ids
      */
     public static List<Integer> getMissingItemIds(@NotNull List<Transport> transports) {
@@ -290,4 +288,21 @@ public class Rs2Slayer {
                 .collect(Collectors.toList());
     }
 
+    public static boolean isSuperior(Actor npc) {
+        return npc != null && isSuperior(npc.getName());
+    }
+
+    public static boolean isSuperior(String name) {
+        return name != null && Arrays.stream(SUPERIOR_NAMES).anyMatch(name::equalsIgnoreCase);
+    }
+
+    public static String[] SUPERIOR_NAMES = new String[] {
+            "Crushing hand", "Chasm Crawler", "Screaming banshee", "Screaming twisted banshee", "Giant rockslug",
+            "Cockathrice", "Flaming pyrelord", "Monstrous basilisk", "Malevolent Mage", "Insatiable Bloodveld",
+            "Insatiable mutated Bloodveld", "Vitreous Jelly", "Vitreous warped Jelly", "Cave abomination",
+            "Abhorrent spectre", "Repugnant spectre", "Choke devil", "King kurask", "Nuclear smoke devil",
+            "Marble gargoyle", "Night beast", "Greater abyssal demon", "Nechryarch", "Basilisk Sentinel",
+            "Infernal pyrelord", "Spiked Turoth", "Shadow Wyrm", "Guardian Drake", "Colossal Hydra",
+            "Mutated Terrorbird", "Mutated Tortoise"
+    };
 }

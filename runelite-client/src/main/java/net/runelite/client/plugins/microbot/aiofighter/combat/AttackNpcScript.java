@@ -4,7 +4,6 @@ import lombok.SneakyThrows;
 import net.runelite.api.Actor;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.gameval.ItemID;
-import net.runelite.api.gameval.VarPlayerID;
 import net.runelite.client.plugins.microbot.Microbot;
 import net.runelite.client.plugins.microbot.Script;
 import net.runelite.client.plugins.microbot.aiofighter.AIOFighterConfig;
@@ -42,14 +41,29 @@ import static net.runelite.api.gameval.VarbitID.*;
 
 public class AttackNpcScript extends Script {
 
-    public static Actor currentNpc = null;
+    public static Actor currentNpc, currentSuperior = null;
     public static AtomicReference<List<Rs2NpcModel>> filteredAttackableNpcs = new AtomicReference<>(new ArrayList<>());
     public static Rs2WorldArea attackableArea = null;
+
     private boolean messageShown = false;
     private int noNpcCount = 0;
+    public static long superiorSpawnedTime = -1L;
 
     public static void skipNpc() {
         currentNpc = null;
+    }
+
+    public static void startSuperiorSpawnedTime() {
+        superiorSpawnedTime = System.currentTimeMillis();
+    }
+
+    public static void endSuperiorSpawnedTime() {
+        superiorSpawnedTime = -1L;
+    }
+
+    private boolean isSuperiorActive() {
+        long spawnTime = superiorSpawnedTime;
+        return spawnTime != -1L && System.currentTimeMillis() - spawnTime < 120000L;
     }
 
     @SneakyThrows
@@ -77,28 +91,19 @@ public class AttackNpcScript extends Script {
 
                 attackableArea = new Rs2WorldArea(config.centerLocation().toWorldArea());
                 attackableArea = attackableArea.offset(config.attackRadius());
-                List<String> npcsToAttack = Arrays.stream(config.attackableNpcs().split(","))
+                List<String> namesToAttack = isSuperiorActive() ? Arrays.asList(Rs2Slayer.SUPERIOR_NAMES)
+                        : Arrays.stream(config.attackableNpcs().split(","))
                         .map(x -> x.trim().toLowerCase())
                         .collect(Collectors.toList());
                 filteredAttackableNpcs.set(
                         Rs2Npc.getAttackableNpcs(config.attackReachableNpcs())
                                 .filter(npc -> npc.getWorldLocation().distanceTo(config.centerLocation()) <= config.attackRadius())
-                                .filter(npc -> npc.getName() != null && !npcsToAttack.isEmpty() && npcsToAttack.stream().anyMatch(npc.getName()::equalsIgnoreCase))
+                                .filter(npc -> shouldAttackNpcBasedOnName(npc, namesToAttack))
                                 .sorted(Comparator.comparingInt((Rs2NpcModel npc) -> npc.getInteracting() == Microbot.getClient().getLocalPlayer() ? 0 : 1)
                                         .thenComparingInt(npc -> Rs2Player.getRs2WorldPoint().distanceToPath(npc.getWorldLocation())))
                                 .collect(Collectors.toList())
                 );
-                final List<Rs2NpcModel> attackableNpcs = new ArrayList<>();
-
-                for (var attackableNpc : filteredAttackableNpcs.get()) {
-                    if (attackableNpc == null || attackableNpc.getName() == null) continue;
-                    for (var npcToAttack : npcsToAttack) {
-                        if (npcToAttack.equalsIgnoreCase(attackableNpc.getName())) {
-                            attackableNpcs.add(attackableNpc);
-                        }
-                    }
-                }
-                filteredAttackableNpcs.set(attackableNpcs);
+                final List<Rs2NpcModel> attackableNpcs = filteredAttackableNpcs.get();
 
                 if (config.state().equals(State.BANKING) || config.state().equals(State.WALKING))
                     return;
@@ -129,33 +134,13 @@ public class AttackNpcScript extends Script {
                         Rs2Camera.turnTo(npc);
 
                     Rs2Npc.interact(npc, "attack");
+                    currentNpc = npc;
+                    if (Rs2Slayer.isSuperior(npc)) {
+                        currentSuperior = npc;
+                    }
                     Microbot.status = "Attacking " + npc.getName();
                     Rs2Antiban.actionCooldown();
                     //sleepUntil(Rs2Player::isInteracting, 1000);
-
-                    if (config.togglePrayer()) {
-                        if (!config.toggleQuickPray()) {
-                            AttackStyle attackStyle = AttackStyleMapper
-                                    .mapToAttackStyle(Rs2NpcManager.getAttackStyle(npc.getId()));
-                            if (attackStyle != null) {
-                                switch (attackStyle) {
-                                    case MAGE:
-                                        Rs2Prayer.toggle(Rs2PrayerEnum.PROTECT_MAGIC, true);
-                                        break;
-                                    case MELEE:
-                                        Rs2Prayer.toggle(Rs2PrayerEnum.PROTECT_MELEE, true);
-                                        break;
-                                    case RANGED:
-                                        Rs2Prayer.toggle(Rs2PrayerEnum.PROTECT_RANGE, true);
-                                        break;
-                                }
-                            }
-                        } else {
-                            Rs2Prayer.toggleQuickPrayer(true);
-                        }
-                    }
-
-
                 } else {
                     if (Rs2Player.getWorldLocation().isInArea(attackableArea)) {
                         Microbot.log(Level.INFO, "No attackable NPC found");
@@ -178,6 +163,10 @@ public class AttackNpcScript extends Script {
         }, 0, 600, TimeUnit.MILLISECONDS);
     }
 
+    private boolean shouldAttackNpcBasedOnName(Rs2NpcModel npc, List<String> attackableNames) {
+        String name = npc.getName();
+        return name != null && !attackableNames.isEmpty() && attackableNames.stream().anyMatch(name::equalsIgnoreCase);
+    }
 
     /**
      * item on npcs that need to kill like rockslug

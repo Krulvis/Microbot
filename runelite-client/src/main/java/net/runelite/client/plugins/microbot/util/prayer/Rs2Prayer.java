@@ -41,10 +41,7 @@ public class Rs2Prayer {
             if (Microbot.getVarbitValue(varBit) == 1) return;
         }
 
-        if (!Rs2Player.hasPrayerPoints()) return;
-
-        Microbot.doInvoke(new NewMenuEntry(-1, name.getIndex(), MenuAction.CC_OP.getId(), 1,-1, "Activate"), new Rectangle(1, 1, Microbot.getClient().getCanvasWidth(), Microbot.getClient().getCanvasHeight()));
-        //Rs2Reflection.invokeMenu(-1, name.getIndex(), MenuAction.CC_OP.getId(), 1,-1, "Activate", "", -1, -1);
+        toggle(name);
     }
 
     public static boolean isQuickPrayerSet(Rs2PrayerEnum prayer) {

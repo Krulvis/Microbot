@@ -2,6 +2,7 @@ package net.runelite.client.plugins.microbot.aiofighter;
 
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.client.plugins.microbot.Microbot;
+import net.runelite.client.plugins.microbot.aiofighter.combat.AttackNpcScript;
 import net.runelite.client.plugins.microbot.aiofighter.combat.SlayerScript;
 import net.runelite.client.plugins.microbot.util.slayer.Rs2Slayer;
 import net.runelite.client.plugins.microbot.util.walker.Rs2Walker;
@@ -14,6 +15,7 @@ import net.runelite.client.ui.overlay.components.TitleComponent;
 
 import javax.inject.Inject;
 import java.awt.*;
+
 @Slf4j
 public class AIOFighterInfoOverlay extends OverlayPanel {
     private final AIOFighterConfig config;
@@ -50,7 +52,7 @@ public class AIOFighterInfoOverlay extends OverlayPanel {
         blacklistButton.setFont(FontManager.getRunescapeBoldFont());
         blacklistButton.setOnClick(() -> {
             // Handle button click
-             AIOFighterPlugin.addBlacklistedSlayerNpcs(Rs2Slayer.slayerTaskMonsterTarget);
+            AIOFighterPlugin.addBlacklistedSlayerNpcs(Rs2Slayer.slayerTaskMonsterTarget);
             SlayerScript.reset();
         });
 
@@ -71,6 +73,14 @@ public class AIOFighterInfoOverlay extends OverlayPanel {
                     .left("Slayer Mode: ")
                     .right(config.slayerMode() ? "Enabled" : "Disabled")
                     .build());
+
+            long superiorSpawnTime = AttackNpcScript.superiorSpawnedTime;
+            if (superiorSpawnTime >= 0) {
+                panelComponent.getChildren().add(LineComponent.builder()
+                        .left("Superior Spawn Time: ")
+                        .right((System.currentTimeMillis() - superiorSpawnTime) / 1000 + "s ago")
+                        .build());
+            }
 
             if (config.slayerMode()) {
                 panelComponent.getChildren().add(LineComponent.builder()
@@ -106,7 +116,7 @@ public class AIOFighterInfoOverlay extends OverlayPanel {
             panelComponent.getChildren().add(LineComponent.builder().build());
             panelComponent.getChildren().add(LineComponent.builder()
                     .left(Microbot.status)
-                    .right("Version:" +  AIOFighterPlugin.version)
+                    .right("Version:" + AIOFighterPlugin.version)
                     .build());
 
             // Add the button to the overlay panel

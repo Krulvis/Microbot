@@ -55,7 +55,7 @@ import java.util.stream.Collectors;
 )
 @Slf4j
 public class AIOFighterPlugin extends Plugin {
-    public static final String version = "2.0.2 BETA";
+    public static final String version = "2.0.3 BETA";
     public static boolean needShopping = false;
     private static final String SET = "Set";
     private static final String CENTER_TILE = ColorUtil.wrapWithColorTag("Center Tile", JagexColors.MENU_TARGET);
@@ -107,7 +107,7 @@ public class AIOFighterPlugin extends Plugin {
 
     @Override
     protected void startUp() throws AWTException {
-		Microbot.pauseAllScripts.compareAndSet(true, false);
+        Microbot.pauseAllScripts.compareAndSet(true, false);
         //initialize any data on startup
         ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
         AtomicReference<ScheduledFuture<?>> futureRef = new AtomicReference<>();
@@ -149,7 +149,7 @@ public class AIOFighterPlugin extends Plugin {
         potionManagerScript.run(config);
         safetyScript.run(config);
         slayerScript.run(config);
-        
+
         // Configure special attack settings
         if (config.useSpecialAttack() && config.specWeapon() != null) {
             Microbot.getSpecialAttackConfigs()
@@ -160,7 +160,7 @@ public class AIOFighterPlugin extends Plugin {
             Microbot.getSpecialAttackConfigs()
                     .setSpecialAttack(config.useSpecialAttack());
         }
-        
+
         Rs2Slayer.blacklistedSlayerMonsters = getBlacklistedSlayerNpcs();
         bankerScript.run(config);
         shopScript.run(config);
@@ -197,17 +197,16 @@ public class AIOFighterPlugin extends Plugin {
         setSafeSpot(new WorldPoint(0, 0, 0));
     }
 
-    public static void setCenter(WorldPoint worldPoint)
-    {
+    public static void setCenter(WorldPoint worldPoint) {
         Microbot.getConfigManager().setConfiguration(
                 AIOFighterConfig.GROUP,
                 "centerLocation",
                 worldPoint
         );
     }
+
     // set safe spot
-    public static void setSafeSpot(WorldPoint worldPoint)
-    {
+    public static void setSafeSpot(WorldPoint worldPoint) {
         Microbot.getConfigManager().setConfiguration(
                 AIOFighterConfig.GROUP,
                 "safeSpotLocation",
@@ -216,6 +215,7 @@ public class AIOFighterPlugin extends Plugin {
 
 
     }
+
     // Set remainingSlayerKills
     public static void setRemainingSlayerKills(int remainingSlayerKills) {
         Microbot.getConfigManager().setConfiguration(
@@ -224,6 +224,7 @@ public class AIOFighterPlugin extends Plugin {
                 remainingSlayerKills
         );
     }
+
     // Set slayerLocation
     public static void setSlayerLocationName(String slayerLocation) {
         Microbot.getConfigManager().setConfiguration(
@@ -232,6 +233,7 @@ public class AIOFighterPlugin extends Plugin {
                 slayerLocation
         );
     }
+
     // Set slayerTask
     public static void setSlayerTask(String slayerTask) {
         Microbot.getConfigManager().setConfiguration(
@@ -240,6 +242,7 @@ public class AIOFighterPlugin extends Plugin {
                 slayerTask
         );
     }
+
     // Set slayerTaskWeaknessThreshold
     public static void setSlayerTaskWeaknessThreshold(int slayerTaskWeaknessThreshold) {
         Microbot.getConfigManager().setConfiguration(
@@ -248,6 +251,7 @@ public class AIOFighterPlugin extends Plugin {
                 slayerTaskWeaknessThreshold
         );
     }
+
     // Set slayerTaskWeaknessItem
     public static void setSlayerTaskWeaknessItem(String slayerTaskWeaknessItem) {
         Microbot.getConfigManager().setConfiguration(
@@ -256,6 +260,7 @@ public class AIOFighterPlugin extends Plugin {
                 slayerTaskWeaknessItem
         );
     }
+
     // Set slayerHasTaskWeakness
     public static void setSlayerHasTaskWeakness(boolean slayerHasTaskWeakness) {
         Microbot.getConfigManager().setConfiguration(
@@ -264,6 +269,7 @@ public class AIOFighterPlugin extends Plugin {
                 slayerHasTaskWeakness
         );
     }
+
     // Set currentInventorySetup
     public static void setCurrentSlayerInventorySetup(InventorySetup currentInventorySetup) {
         Microbot.log("Setting current inventory setup to: " + currentInventorySetup.getName());
@@ -273,6 +279,7 @@ public class AIOFighterPlugin extends Plugin {
                 currentInventorySetup
         );
     }
+
     // Get currentInventorySetup
     public static InventorySetup getCurrentSlayerInventorySetup() {
         return Microbot.getConfigManager().getConfiguration(
@@ -281,6 +288,7 @@ public class AIOFighterPlugin extends Plugin {
                 InventorySetup.class
         );
     }
+
     // Get defaultInventorySetup
     public static InventorySetup getDefaultInventorySetup() {
         return Microbot.getConfigManager().getConfiguration(
@@ -289,6 +297,7 @@ public class AIOFighterPlugin extends Plugin {
                 InventorySetup.class
         );
     }
+
     // Add NPC to blacklist blacklistedSlayerNpcs
     public static void addBlacklistedSlayerNpcs(String npcName) {
         Microbot.getConfigManager().setConfiguration(
@@ -301,6 +310,7 @@ public class AIOFighterPlugin extends Plugin {
                 ) + npcName + ","
         );
     }
+
     // Get blacklistedSlayerNpcs as a list
     public static List<String> getBlacklistedSlayerNpcs() {
         return Arrays.asList(Microbot.getConfigManager().getConfiguration(
@@ -309,6 +319,7 @@ public class AIOFighterPlugin extends Plugin {
                 String.class
         ).toString().split(","));
     }
+
     //set Inventory Setup
     private void setInventorySetup(InventorySetup inventorySetup) {
         Microbot.getConfigManager().setConfiguration(
@@ -334,12 +345,14 @@ public class AIOFighterPlugin extends Plugin {
                 state
         );
     }
+
     public static String getNpcAttackList() {
-       return Microbot.getConfigManager().getConfiguration(
-               AIOFighterConfig.GROUP,
+        return Microbot.getConfigManager().getConfiguration(
+                AIOFighterConfig.GROUP,
                 "monster"
         );
     }
+
     public static void addNpcToList(String npcName) {
         Microbot.getConfigManager().setConfiguration(
                 AIOFighterConfig.GROUP,
@@ -348,6 +361,7 @@ public class AIOFighterPlugin extends Plugin {
         );
 
     }
+
     public static void removeNpcFromList(String npcName) {
         Microbot.getConfigManager().setConfiguration(
                 AIOFighterConfig.GROUP,
@@ -376,12 +390,18 @@ public class AIOFighterPlugin extends Plugin {
         if (event.getMessage().contains("reach that")) {
             AttackNpcScript.skipNpc();
         }
+
+        String chatMsg = Text.removeTags(event.getMessage()); //remove color and linebreaks
+
+        if (chatMsg.equals("A superior foe has appeared...")) {
+            AttackNpcScript.startSuperiorSpawnedTime();
+        }
+
     }
+
     // on setting change
     @Subscribe
     public void onConfigChanged(ConfigChanged event) {
-
-
         if (event.getKey().equals("Safe Spot")) {
 
             if (!config.toggleSafeSpot()) {
@@ -389,7 +409,7 @@ public class AIOFighterPlugin extends Plugin {
                 setSafeSpot(new WorldPoint(0, 0, 0));
             }
         }
-        if(event.getKey().equals("Combat")) {
+        if (event.getKey().equals("Combat")) {
             if (!config.toggleCombat() && config.toggleCenterTile()) {
                 setCenter(new WorldPoint(0, 0, 0));
             }
@@ -424,7 +444,7 @@ public class AIOFighterPlugin extends Plugin {
     public void onGameTick(GameTick gameTick) {
         try {
             //execute flicker script
-            if(config.togglePrayer())
+            if (config.togglePrayer())
                 flickerScript.onGameTick();
         } catch (Exception e) {
             log.info("AIO Fighter Plugin onGameTick Error: " + e.getMessage());
@@ -434,7 +454,11 @@ public class AIOFighterPlugin extends Plugin {
     @Subscribe
     public void onNpcDespawned(NpcDespawned npcDespawned) {
         try {
-            if(config.togglePrayer())
+            if (npcDespawned.getNpc() == AttackNpcScript.currentSuperior) {
+                AttackNpcScript.currentSuperior = null;
+                AttackNpcScript.endSuperiorSpawnedTime();
+            }
+            if (config.togglePrayer())
                 flickerScript.onNpcDespawned(npcDespawned);
         } catch (Exception e) {
             log.info("AIO Fighter Plugin onNpcDespawned Error: " + e.getMessage());
@@ -442,7 +466,7 @@ public class AIOFighterPlugin extends Plugin {
     }
 
     @Subscribe
-    public void onHitsplatApplied(HitsplatApplied event){
+    public void onHitsplatApplied(HitsplatApplied event) {
         try {
             if (event.getActor() != Microbot.getClient().getLocalPlayer()) return;
             final Hitsplat hitsplat = event.getHitsplat();
@@ -459,11 +483,13 @@ public class AIOFighterPlugin extends Plugin {
             log.info("AIO Fighter Plugin onHitsplatApplied Error: " + e.getMessage());
         }
     }
+
     @Subscribe
     public void onMenuOpened(MenuOpened event) {
         lastMenuOpenedPoint = Microbot.getClient().getMouseCanvasPosition();
         trueTile = getSelectedWorldPoint();
     }
+
     @Subscribe
     private void onMenuEntryAdded(MenuEntryAdded event) {
         if (Microbot.getClient().isKeyPressed(KeyCode.KC_SHIFT) && event.getOption().equals(WALK_HERE) && event.getTarget().isEmpty() && config.toggleCenterTile()) {
@@ -493,6 +519,7 @@ public class AIOFighterPlugin extends Plugin {
         }
         return null;
     }
+
     public WorldPoint calculateMapPoint(Point point) {
         WorldMap worldMap = Microbot.getClient().getWorldMap();
         float zoom = worldMap.getWorldMapZoom();
@@ -508,6 +535,7 @@ public class AIOFighterPlugin extends Plugin {
 
         return mapPoint.dx(dx).dy(dy);
     }
+
     public Point mapWorldPointToGraphicsPoint(WorldPoint worldPoint) {
         WorldMap worldMap = Microbot.getClient().getWorldMap();
 
@@ -540,8 +568,8 @@ public class AIOFighterPlugin extends Plugin {
         }
         return null;
     }
-    private void onMenuOptionClicked(MenuEntry entry) {
 
+    private void onMenuOptionClicked(MenuEntry entry) {
 
 
         if (entry.getOption().equals(SET) && entry.getTarget().equals(CENTER_TILE)) {
@@ -559,8 +587,7 @@ public class AIOFighterPlugin extends Plugin {
 
 
     @Subscribe
-    private void onMenuOptionClicked(MenuOptionClicked event)
-    {
+    private void onMenuOptionClicked(MenuOptionClicked event) {
         if (event.getMenuOption().equals(ADD_TO)) {
             addNpcToList(getNpcNameFromMenuEntry(event.getMenuTarget()));
         }
@@ -568,6 +595,7 @@ public class AIOFighterPlugin extends Plugin {
             removeNpcFromList(getNpcNameFromMenuEntry(event.getMenuTarget()));
         }
     }
+
     private void addMenuEntry(MenuEntryAdded event, String option, String target, int position) {
         List<MenuEntry> entries = new LinkedList<>(Arrays.asList(Microbot.getClient().getMenuEntries()));
 

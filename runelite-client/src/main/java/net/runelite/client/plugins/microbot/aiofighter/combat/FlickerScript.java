@@ -16,6 +16,7 @@ import net.runelite.client.plugins.microbot.util.npc.Rs2NpcModel;
 import net.runelite.client.plugins.microbot.util.player.Rs2Player;
 import net.runelite.client.plugins.microbot.util.prayer.Rs2Prayer;
 import net.runelite.client.plugins.microbot.util.prayer.Rs2PrayerEnum;
+import net.runelite.client.plugins.microbot.util.slayer.Rs2Slayer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -142,7 +143,7 @@ public class FlickerScript extends Script {
         for (Monster monster : currentMonstersAttackingUsRef.get()) {
             monster.lastAttack--;
             if (monster.lastAttack == tickToFlick && !monster.npc.isDead()) {
-                prayFlickAttackStyle = flickQuickPrayer ? AttackStyle.MIXED : monster.attackStyle;
+                prayFlickAttackStyle = flickQuickPrayer && !Rs2Slayer.isSuperior(monster.npc) ? AttackStyle.MIXED : monster.attackStyle;
             }
             resetLastAttack(false);
         }
