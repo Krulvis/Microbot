@@ -116,9 +116,9 @@ public class CollisionMap {
 
             if (TransportType.isTeleport(transport.getType())) {
                 if (config.isIgnoreTeleportAndItems()) continue;
-                neighbors.add(new TransportNode(transport.getDestination(), node, config.getDistanceBeforeUsingTeleport() + transport.getDuration()));
+                neighbors.add(new TransportNode(transport, node, config.getDistanceBeforeUsingTeleport() + transport.getDuration()));
             } else {
-                neighbors.add(new TransportNode(transport.getDestination(), node, transport.getDuration()));
+                neighbors.add(new TransportNode(transport, node, transport.getDuration()));
             }
             //END microbot variables
         }

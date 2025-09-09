@@ -1,5 +1,6 @@
 package net.runelite.client.plugins.microbot.shortestpath.pathfinder;
 
+import lombok.Getter;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.plugins.microbot.shortestpath.WorldPointUtil;
 
@@ -11,6 +12,8 @@ public class Node {
     public final int packedPosition;
     public final Node previous;
     public final int cost;
+
+    public WorldPoint getPosition(){return WorldPointUtil.unpackWorldPoint(packedPosition);};
 
     public Node(WorldPoint position, Node previous, int wait) {
         this.packedPosition = WorldPointUtil.packWorldPoint(position);

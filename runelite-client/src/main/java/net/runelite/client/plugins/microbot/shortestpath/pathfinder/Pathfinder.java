@@ -141,6 +141,10 @@ public class Pathfinder implements Runnable {
             } else {
                 node = boundary.removeFirst();
             }
+            if (node instanceof TransportNode) {
+                TransportNode tnode = (TransportNode) node;
+                log.debug("TransportNode to={}, ={}, after {} steps", tnode.getPosition(), tnode.getTransport().getDisplayInfo(), stats.nodesChecked);
+            }
 
             if (wildernessLevel > 0) {
                 // We don't need to remove teleports when going from 20 to 21 or higher,
